@@ -169,11 +169,11 @@ class _ReportPageState extends State<ReportPage> {
           touchedIndex = -1;
         });
       },
-      child:  Scaffold(
+      child: Scaffold(
         backgroundColor: colorMainBG_greedot,
         body: SafeArea(
-          child: SingleChildScrollView( // 전체 화면을 스크롤 가능하게 변경
-            child: Column( // 위젯들을 수직으로 배열
+          child: SingleChildScrollView(
+            child: Column(
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(top: 40),
@@ -187,11 +187,28 @@ class _ReportPageState extends State<ReportPage> {
                 if (touchedIndex != -1) //
                   buildScrollableEmotionSentences(emotions.keys.elementAt(touchedIndex)),
                 SizedBox(height: 20),
-                Text('< 전체 대화 로그 >'),
-                buildScrollableDialogLog(),
+                Row( // 여기에 변경사항을 적용합니다.
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 내부 요소들을 화면에 균등하게 분포시킵니다.
+                  children: [
+                    Expanded( // 첫 번째 컨테이너를 Expanded로 감싸 화면의 절반을 차지하도록 합니다.
+                      child: Column(
+                        children: <Widget>[
+                          Text('< 전체 대화 로그 >'),
+                          buildScrollableDialogLog(),
+                        ],
+                      ),
+                    ),
+                    Expanded( // 두 번째 컨테이너도 Expanded로 감싸 화면의 나머지 절반을 차지하도록 합니다.
+                      child: Column(
+                        children: <Widget>[
+                          Text('< 하루 대화 요약 >'),
+                          tempText(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(height: 20),
-                Text('< 하루 대화 요약 >'),
-                tempText(),// 대화 로그를 항상 표시
               ],
             ),
           ),
@@ -199,6 +216,7 @@ class _ReportPageState extends State<ReportPage> {
       ),
     );
   }
+
 
   Widget buildChartAndImageRow() {
     return Container(
@@ -290,7 +308,7 @@ class _ReportPageState extends State<ReportPage> {
     double containerWidth = screenWidth - 20;
 
     return Container(
-      width: containerWidth, // 여기에서 Container의 가로 길이를 설정합니다.
+      width: containerWidth/2, // 여기에서 Container의 가로 길이를 설정합니다.
       margin: EdgeInsets.only(left: 10, right: 10),
       height: 200,
       padding: EdgeInsets.all(16.0),
@@ -321,7 +339,7 @@ class _ReportPageState extends State<ReportPage> {
     double containerWidth = screenWidth - 20;
 
     return Container(
-      width: containerWidth, // 여기에서 Container의 가로 길이를 설정합니다.
+      width: containerWidth/2,
       margin: EdgeInsets.only(left: 10, right: 10),
       height: 200,
       padding: EdgeInsets.all(16.0),
@@ -340,7 +358,7 @@ class _ReportPageState extends State<ReportPage> {
       ),
       child: SingleChildScrollView(
         child: Text(
-          '아이 A는 친구와 적극적으로 소통하려는 모습을 보이며, \n 일상적인 인사, 놀이 제안, 장난스러운 도발 및 반응을 통해 다양한 감정과 행동을 표현했습니다. \n 대체로 활발하고 친구와의 상호작용을 즐기는 태도가 눈에 띕니다',
+          '아이는 친구와 적극적으로 소통하려는 모습을 보이며, 일상적인 인사, 놀이 제안, 장난스러운 도발 및 반응을 통해 다양한 감정과 행동을 표현했습니다. 대체로 활발하고 친구와의 상호작용을 즐기는 태도가 눈에 띕니다',
           style: TextStyle(fontSize: 14.0, fontWeight:FontWeight.bold),
         ),
       ),
