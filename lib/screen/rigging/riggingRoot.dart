@@ -68,105 +68,87 @@ class _RiggingRootState extends State<RiggingRoot> {
     Size screenSize = MediaQuery.of(context).size;
 
     return Container(
-      width: screenSize.width,
-      height: screenSize.height,
-      color: colorMainBG_greedot,
-      child: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Stack(
-              children: <Widget>[
-                CarouselSlider(
-                  items: _grees.asMap().entries.map((entry) {
-                    int idx = entry.key;
-                    Gree gree = entry.value;
-                    String? gifUrl = _greeGifs[idx];
-                    return gifUrl == null
-                        ? Text("No 'dab' GIF found")
-                        : FlipCard(
-                            front: Image.network(gifUrl, fit: BoxFit.cover),
-                            back: buildCardBack(gree, context),
-                          );
-                  }).toList(),
-                  options: CarouselOptions(
-                    height: 500,
-                    viewportFraction: 0.33,
-                    autoPlay: true,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        activeIndex = index;
-                      });
-                    },
+        width: screenSize.width,
+        height: screenSize.height,
+        color: colorMainBG_greedot,
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Stack(
+          children: <Widget>[
+            CarouselSlider(
+              items: _grees.asMap().entries.map((entry) {
+                int idx = entry.key;
+                Gree gree = entry.value;
+                String? gifUrl = _greeGifs[idx];
+                return gifUrl == null
+                    ? Text("No 'dab' GIF found")
+                    : FlipCard(
+                  front: Image.network(gifUrl, fit: BoxFit.cover),
+                  back: buildCardBack(gree, context),
+                );
+              }).toList(),
+              options: CarouselOptions(
+                height: 600,
+                viewportFraction: 0.33,
+                autoPlay: true,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    activeIndex = index;
+                  });
+                },
+              ),
+            ),
+            Positioned(
+              bottom: 200,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: AnimatedSmoothIndicator(
+                  activeIndex: activeIndex,
+                  count: _grees.length,
+                  effect: SlideEffect(
+                    dotHeight: 6,
+                    dotWidth: 6,
+                    dotColor: Colors.black26,
+                    activeDotColor: Colors.white,
                   ),
                 ),
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: AnimatedSmoothIndicator(
-                      activeIndex: activeIndex,
-                      count: _grees.length,
-                      effect: SlideEffect(
-                        dotHeight: 6,
-                        dotWidth: 6,
-                        dotColor: Colors.black26,
-                        activeDotColor: Colors.white,
-                      ),
-                    ),
+              ),
+            ),
+            const Positioned(
+              bottom: 120,
+              left: 0,
+              right: 0,
+              child: Text(
+                  "캐릭터를 터치하면 캐릭터 정보가 보여요!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: colorSnackBar_greedot, fontSize: 15, fontFamily:'greedot_font')
+              ),
+            ),
+            Positioned(
+              bottom: 60,
+              left: 0,
+              right: 0, // 이 부분을 수정하여 버튼을 화면 중앙에 배치
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const SizedBox(height: 35),
+                  EleButton_greedot(
+                    width: 190,
+                    height: 50,
+                    additionalFunc: () => pageNavi.changePage('newgree'),
+                    buttonText: "그리 새로 만들기",
+                    icon: Icons.create, // 아이콘 지정
                   ),
-                ),
-                const Positioned(
-                  bottom: 120,
-                  left: 0,
-                  right: 0,
-                  child: Text(
-                      "캐릭터를 터치하면 캐릭터 정보가 보여요!",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: colorSnackBar_greedot, fontSize: 15, fontFamily:'greedot_font')
-                  ),
-                ),
-                Positioned(
-                  bottom: 50,
-                  left: 0,
-                  right: 210,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const SizedBox(height: 35),
-                      EleButton_greedot(
-                        width: 190,
-                        height: 50,
-                        additionalFunc: () => pageNavi.changePage('FavoriteListPage'),
-                        buttonText: "AI 친구들 모아보기",
-                        icon: Icons.group, // 아이콘 지정
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 50,
-                  left: 210,
-                  right: 0,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const SizedBox(height: 35),
-                      EleButton_greedot(
-                        width: 190,
-                        height: 50,
-                        additionalFunc: () => pageNavi.changePage('newgree'),
-                        buttonText: "그리 새로 만들기",
-                        icon: Icons.create, // 아이콘 지정
-                      ),
-
-                    ],
-                  ),
-                ),
-              ],
-            )
+                ],
+              ),
+            ),
+          ],
+        )
     );
-          }
   }
+
+}
 
 
 Widget buildCardBack(Gree gree, BuildContext context) {

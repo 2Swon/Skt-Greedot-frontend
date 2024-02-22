@@ -28,7 +28,7 @@ class QuestionWidget extends StatelessWidget {
         AnimatedOpacity(
           opacity: 1.0, // 이 부분은 필요에 따라 조정하실 수 있습니다.
           duration: Duration(milliseconds: 500),
-          child: Text(questionList[step]),
+          child: Text(questionList[step],style:TextStyle(fontSize:22,fontFamily:'greedot_font')),
         ),
         SizedBox(height: 30),
         AnimatedOpacity(
@@ -47,7 +47,7 @@ class QuestionWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorBut_greedot,
         border: Border.all(color: colorBut_greedot, width: 4),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -56,7 +56,7 @@ class QuestionWidget extends StatelessWidget {
             ListTile(
               title: Text(
                 optionsList[step][i],
-                style: TextStyle(color: Colors.white,fontFamily:'greedot_font'),
+                style: TextStyle(color: Colors.white,fontSize:18,fontFamily:'greedot_font'),
               ),
               leading: Radio<String>(
                 value: optionsList[step][i],
@@ -66,7 +66,7 @@ class QuestionWidget extends StatelessWidget {
                 },
               ),
             ),
-          if (step < optionsList.length - 1)
+          if (step <= optionsList.length - 1)
             Divider(color: Colors.white, thickness: 2),
         ],
       ),

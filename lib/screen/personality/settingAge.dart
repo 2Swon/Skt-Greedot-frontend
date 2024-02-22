@@ -311,7 +311,7 @@ class _SettingPersonalityState extends State<SettingPersonality> {
             ElevatedButton(
               onPressed: _goBack,
               child: Text('이전',
-                style: TextStyle(color: colorBig_But_greedot),),
+                style: TextStyle(color: colorBig_But_greedot,fontSize:18,fontFamily:'greedot_font'),),
               style: ElevatedButton.styleFrom(
                 primary: colorBut_greedot, // Background color
               ),
@@ -321,7 +321,7 @@ class _SettingPersonalityState extends State<SettingPersonality> {
           ElevatedButton(
             onPressed: _goNext,
             child: Text(_showResult ? '생성완료' : '다음',
-              style: TextStyle(color: colorBig_But_greedot),),
+              style: TextStyle(color: colorBig_But_greedot,fontSize:18,fontFamily:'greedot_font'),),
             style: ElevatedButton.styleFrom(
               primary: colorBut_greedot, // Background color
             ),

@@ -34,6 +34,7 @@ class FavoriteListPage extends StatelessWidget {
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             // 데이터 로딩 성공하고 데이터가 비어있지 않을 때
             return GridView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 75.0), // 여기에 패딩을 추가했습니다.
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // 한 줄에 2개의 그리드 항목을 표시
                 childAspectRatio: 2 / 1.2, // 너비 대 높이 비율을 2:1.2로 설정

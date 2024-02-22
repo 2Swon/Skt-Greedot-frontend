@@ -9,6 +9,7 @@ import '../../structure/structureInit.dart';
 import '../../widget/design/basicButtons.dart';
 import '../../provider/pageNavi.dart';
 import '../../service/gree_service.dart';
+import '../loading/loadingGif.dart';
 
 class LoadingNotifier with ChangeNotifier {
   bool _isLoading = false;
@@ -93,17 +94,27 @@ void showLoadingDialog(BuildContext context) {
     barrierDismissible: false, // 사용자가 대화 상자 외부를 탭해도 닫히지 않도록 설정
     builder: (BuildContext context) {
       return AlertDialog(
-        content: Row(
+        content: Column(
+          mainAxisSize: MainAxisSize.min, // 컨텐츠의 크기에 맞게 Column 크기를 조정합니다.
+          crossAxisAlignment: CrossAxisAlignment.center, // 항목들을 중앙으로 정렬합니다.
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20), // 스피너와 텍스트 사이의 간격
-            Text("생성 중입니다..."),
+            LoadingGifWidget(), // GIF 위젯
+            SizedBox(height: 20), // GIF와 로딩 인디케이터 사이의 간격
+            Row(
+              mainAxisSize: MainAxisSize.min, // Row의 크기를 내용물에 맞게 조정합니다.
+              children: [
+                CircularProgressIndicator(), // 로딩 인디케이터
+                SizedBox(width: 20), // 인디케이터와 텍스트 사이의 간격
+                Text("생성 중입니다..."), // 로딩 텍스트
+              ],
+            ),
           ],
         ),
       );
     },
   );
 }
+
 
 void closeLoadingDialog(BuildContext context) {
   Navigator.of(context).pop(); // 대화 상자 닫기
