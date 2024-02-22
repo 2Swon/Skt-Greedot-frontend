@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../service/gree_service.dart';
 import '../../widget/design/settingColor.dart';
@@ -22,75 +23,136 @@ class FavoriteItemCard extends StatefulWidget {
 
 class _FavoriteItemCardState extends State<FavoriteItemCard> {
   bool isFavorite = false;
+  Color? cardColor; // 카드의 배경색을 저장할 변수
+
+  @override
+  void initState() {
+    super.initState();
+    cardColor = getRandomPastelColor(); // 카드의 배경색을 랜덤하게 설정
+  }
+
+  // 랜덤 파스텔 색상을 생성하는 함수
+  Color getRandomPastelColor() {
+    Random random = Random();
+    int r = random.nextInt(56) + 175;
+    int g = random.nextInt(56) + 175;
+    int b = random.nextInt(56) + 175;
+    return Color.fromRGBO(r, g, b, 1.0);
+  }
 
   @override
   Widget build(BuildContext context) {
     final pageNavi = Provider.of<PageNavi>(context, listen: false);
-
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      color: colorFilling_greedot,
-      child: Stack(
-        children: [
-          FutureBuilder<String?>(
-            future: ApiServiceGree.fetchSpecificGreeGif(widget.gree.id ?? 0),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError || !snapshot.hasData) {
-                String errorMessage = "Error fetching GIFs";
-                if (snapshot.hasError) {
-                  errorMessage += ": ${snapshot.error}";
-                } else if (!snapshot.hasData) {
-                  errorMessage = "No GIF found";
-                }
-                return Text(errorMessage);
-              }else {
-                return Image.network(snapshot.data!, fit: BoxFit.cover);
-              }
-            },
-          ),
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.red : Colors.grey,
+    return Scaffold(
+      backgroundColor: colorNaviBar_greedot,
+      body: SingleChildScrollView(
+        child: AspectRatio(
+        aspectRatio: 2 / 1.2,
+            child: AspectRatio(
+            aspectRatio: 2 / 1.2,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-              onPressed: () {
-                setState(() {
-                  isFavorite = !isFavorite;
-                  //widget.gree.id;
-                });
-              },
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: IntrinsicWidth(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              color: cardColor,
+              margin: EdgeInsets.all(10), // 필요한 경우 마진 조정
+              child: Row(
                 children: [
-                  EleButton_greedot(
-                    isSmall: false,
-                    buttonText: "대화 시작",
-                    fontSize: 16,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    additionalFunc: () => pageNavi.changePage('ChatPage', data: PageData(greeId: widget.gree.id)),
+                  Expanded(
+                    flex: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center, // 수정: 가로 중앙 정렬을 위해 변경
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center, // 가로 중앙 정렬
+                            children: [
+                              Text(
+                                widget.gree.gree_name ?? 'Unknown',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center, // 가로 중앙 정렬
+                            children: [
+                              Text(
+                                widget.gree.prompt_mbti ?? 'Unknown',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center, // 버튼들 가로 중앙 정렬
+                            children: [
+                              EleButton_greedot(
+                                isSmall: false,
+                                buttonText: "대화 시작",
+                                fontSize: 16,
+                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                width: 170,
+                                height: 50,
+                                additionalFunc: () => pageNavi.changePage('ChatPage', data: PageData(greeId: widget.gree.id)),
+                                icon: Icons.chat, // '대화 시작' 버튼에 대화 아이콘 추가
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center, // 버튼들 가로 중앙 정렬
+                            children: [
+                              EleButton_greedot(
+                                isSmall: false,
+                                buttonText: "리포트 보기",
+                                fontSize: 16,
+                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                width: 170,
+                                height: 50,
+                                additionalFunc: () => pageNavi.changePage('ReportPage', data: PageData(greeId: widget.gree.id)),
+                                icon: Icons.assessment, // '리포트 보기' 버튼에 리포트 아이콘 추가
+                              ),
+                            ],
+                          ),
+
+                        ],
+                      ),
+                    ),
                   ),
-                  SizedBox(height: 4), // 버튼 사이의 간격을 조정
-                  EleButton_greedot(
-                    isSmall: false,
-                    buttonText: "리포트 보기",
-                    fontSize: 16,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    additionalFunc: () => pageNavi.changePage('ReportPage', data: PageData(greeId: widget.gree.id)),
+                  Expanded(
+                    flex: 6, // GIF 이미지를 위한 공간 비율
+                    child: FutureBuilder<String?>(
+                      future: ApiServiceGree.fetchSpecificGreeGif(widget.gree.id ?? 0),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError || !snapshot.hasData) {
+                          String errorMessage = "Error fetching GIFs";
+                          if (snapshot.hasError) {
+                            errorMessage += ": ${snapshot.error}";
+                          } else if (!snapshot.hasData) {
+                            errorMessage = "No GIF found";
+                          }
+                          return Center(child: Text(errorMessage));
+                        } else {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(15),
+                              bottomRight: Radius.circular(15),
+                            ),
+                            child: Image.network(snapshot.data!, fit: BoxFit.cover),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ],
               ),
             ),
+
           ),
           Positioned(
             top: 12,

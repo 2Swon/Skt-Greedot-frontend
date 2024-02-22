@@ -36,6 +36,7 @@ class FavoriteListPage extends StatelessWidget {
             return GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // 한 줄에 2개의 그리드 항목을 표시
+                childAspectRatio: 2 / 1.2, // 너비 대 높이 비율을 2:1.2로 설정
               ),
               itemCount: snapshot.data!.length, // 데이터 리스트의 길이만큼 아이템 수를 설정
               itemBuilder: (context, index) {
@@ -45,6 +46,7 @@ class FavoriteListPage extends StatelessWidget {
                 return FavoriteItemCard(gree: gree);
               },
             );
+
           } else {
             // 데이터가 비어있을 때 표시할 위젯
             return Center(child: Text("No items available."));

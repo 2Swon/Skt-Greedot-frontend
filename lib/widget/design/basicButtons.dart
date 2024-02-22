@@ -28,10 +28,10 @@ class EleButton_greedot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double buttonWidth = isSmall ? 70 : width;
-    final double buttonHeight = isSmall ? 15 : height;
-    final double buttonFontSize = isSmall ? 11.0 : fontSize;
-    final EdgeInsetsGeometry buttonPadding = isSmall ? EdgeInsets.zero : padding;
+    // 버튼 디자인을 위한 색상과 그림자 효과 정의
+    final Color buttonColor = colorBut_greedot; // 예시 색상
+    final double elevation = 5.0; // 그림자 높이
+    final Color shadowColor = Colors.black.withOpacity(0.5); // 그림자 색상
 
     return ElevatedButton(
       style: ButtonStyle(
@@ -41,7 +41,7 @@ class EleButton_greedot extends StatelessWidget {
         textStyle: MaterialStateProperty.all(TextStyle(fontSize: buttonFontSize,fontFamily:'greedot_font')),
       ),
       onPressed: () {
-        additionalFunc?.call(); // additionalFunc 호출 방식 간소화
+        additionalFunc?.call();
         if (gotoScene != null) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => gotoScene!()));
         }
