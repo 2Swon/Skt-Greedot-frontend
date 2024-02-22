@@ -12,10 +12,7 @@ import 'package:provider/provider.dart';
 class FavoriteItemCard extends StatefulWidget {
   final Gree gree;
 
-  FavoriteItemCard({
-    Key? key,
-    required this.gree,
-  }) : super(key: key);
+  FavoriteItemCard({Key? key, required this.gree}) : super(key: key);
 
   @override
   _FavoriteItemCardState createState() => _FavoriteItemCardState();
@@ -46,135 +43,115 @@ class _FavoriteItemCardState extends State<FavoriteItemCard> {
     return Scaffold(
       backgroundColor: colorNaviBar_greedot,
       body: SingleChildScrollView(
-        child: AspectRatio(
-        aspectRatio: 2 / 1.2,
-            child: AspectRatio(
-            aspectRatio: 2 / 1.2,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              color: cardColor,
-              margin: EdgeInsets.all(10), // 필요한 경우 마진 조정
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center, // 수정: 가로 중앙 정렬을 위해 변경
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center, // 가로 중앙 정렬
-                            children: [
-                              Text(
-                                widget.gree.gree_name ?? 'Unknown',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center, // 가로 중앙 정렬
-                            children: [
-                              Text(
-                                widget.gree.prompt_mbti ?? 'Unknown',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center, // 버튼들 가로 중앙 정렬
-                            children: [
-                              EleButton_greedot(
-                                isSmall: false,
-                                buttonText: "대화 시작",
-                                fontSize: 16,
-                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                                width: 170,
-                                height: 50,
-                                additionalFunc: () => pageNavi.changePage('ChatPage', data: PageData(greeId: widget.gree.id)),
-                                icon: Icons.chat, // '대화 시작' 버튼에 대화 아이콘 추가
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center, // 버튼들 가로 중앙 정렬
-                            children: [
-                              EleButton_greedot(
-                                isSmall: false,
-                                buttonText: "리포트 보기",
-                                fontSize: 16,
-                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                                width: 170,
-                                height: 50,
-                                additionalFunc: () => pageNavi.changePage('ReportPage', data: PageData(greeId: widget.gree.id)),
-                                icon: Icons.assessment, // '리포트 보기' 버튼에 리포트 아이콘 추가
-                              ),
-                            ],
-                          ),
+        child: Stack(
+          children: [
+            AspectRatio(
+              aspectRatio: 2 / 1.2,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                color: cardColor,
+                margin: EdgeInsets.all(10), // 필요한 경우 마진 조정
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center, // 수정: 가로 중앙 정렬을 위해 변경
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center, // 가로 중앙 정렬
+                              children: [
+                                Text(
+                                  widget.gree.gree_name ?? 'Unknown',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 4),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center, // 가로 중앙 정렬
+                              children: [
+                                Text(
+                                  widget.gree.prompt_mbti ?? 'Unknown',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center, // 버튼들 가로 중앙 정렬
+                              children: [
+                                EleButton_greedot(
+                                  isSmall: false,
+                                  buttonText: "대화 시작",
+                                  fontSize: 16,
+                                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                  width: 170,
+                                  height: 50,
+                                  additionalFunc: () => pageNavi.changePage('ChatPage', data: PageData(greeId: widget.gree.id)),
+                                  icon: Icons.chat, // '대화 시작' 버튼에 대화 아이콘 추가
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 4),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center, // 버튼들 가로 중앙 정렬
+                              children: [
+                                EleButton_greedot(
+                                  isSmall: false,
+                                  buttonText: "리포트 보기",
+                                  fontSize: 16,
+                                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                  width: 170,
+                                  height: 50,
+                                  additionalFunc: () => pageNavi.changePage('ReportPage', data: PageData(greeId: widget.gree.id)),
+                                  icon: Icons.assessment, // '리포트 보기' 버튼에 리포트 아이콘 추가
+                                ),
+                              ],
+                            ),
 
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 6, // GIF 이미지를 위한 공간 비율
-                    child: FutureBuilder<String?>(
-                      future: ApiServiceGree.fetchSpecificGreeGif(widget.gree.id ?? 0),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError || !snapshot.hasData) {
-                          String errorMessage = "Error fetching GIFs";
-                          if (snapshot.hasError) {
-                            errorMessage += ": ${snapshot.error}";
-                          } else if (!snapshot.hasData) {
-                            errorMessage = "No GIF found";
+                    Expanded(
+                      flex: 6, // GIF 이미지를 위한 공간 비율
+                      child: FutureBuilder<String?>(
+                        future: ApiServiceGree.fetchSpecificGreeGif(widget.gree.id ?? 0),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError || !snapshot.hasData) {
+                            String errorMessage = "Error fetching GIFs";
+                            if (snapshot.hasError) {
+                              errorMessage += ": ${snapshot.error}";
+                            } else if (!snapshot.hasData) {
+                              errorMessage = "No GIF found";
+                            }
+                            return Center(child: Text(errorMessage));
+                          } else {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(15),
+                                bottomRight: Radius.circular(15),
+                              ),
+                              child: Image.network(snapshot.data!, fit: BoxFit.cover),
+                            );
                           }
-                          return Center(child: Text(errorMessage));
-                        } else {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(15),
-                              bottomRight: Radius.circular(15),
-                            ),
-                            child: Image.network(snapshot.data!, fit: BoxFit.cover),
-                          );
-                        }
-                      },
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-
-          ),
-          Positioned(
-            top: 12,
-            left: 8,
-            right: 8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.gree.gree_name ?? 'Unknown',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25,fontFamily:'greedot_font'),
-                ),
-                SizedBox(height: 4), // 간격 추가
-                Text(
-                  widget.gree.prompt_mbti ?? 'Unknown',
-                  style: TextStyle(fontSize: 18,fontFamily:'greedot_font'),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
