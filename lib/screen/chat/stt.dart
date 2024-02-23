@@ -73,7 +73,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void createKeywordMapping() {
-    List<String> koreanKeywords = ['춤', '걷', '웨이브', '점프']; // 한글 키워드 목록
+    List<String> koreanKeywords = ['걷', '춤', '안녕']; // 한글 키워드 목록
     List<String> keys = keywordToGifUrl.keys.toList();
 
     for (int i = 0; i < keys.length; i++) {
