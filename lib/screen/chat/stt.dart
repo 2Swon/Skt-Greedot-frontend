@@ -73,13 +73,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void createKeywordMapping() {
-    List<String> koreanKeywords = ['춤', '걷', '웨이브', '점프']; // 한글 키워드 목록
+    List<String> koreanKeywords = ['걷', '춤', '안녕']; // 한글 키워드 목록
     List<String> keys = keywordToGifUrl.keys.toList();
 
     for (int i = 0; i < keys.length; i++) {
       keywordMapping[koreanKeywords[i]] = keys[i];
     }
-    //print("keywordMapping contents: $keywordMapping");
+    print("keywordMapping contents: $keywordMapping");
   }
 
   void _onSpeechResult(String newText) {
@@ -94,7 +94,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _startListening() async {
-    var available = await speechToText.initialize(
+    bool available = await speechToText.initialize(
       onError: (val) => print('Error: $val'),
       onStatus: (val) => print('Status: $val'),
     );
@@ -102,12 +102,11 @@ class _ChatPageState extends State<ChatPage> {
       setState(() => isListening = true);
       speechToText.listen(
         onResult: (result) {
-          if (result.finalResult) { // 최종 결과가 나왔을 때만 처리합니다.
+          if (result.finalResult) {
             _onSpeechResult(result.recognizedWords);
           }
         },
-        //listenFor: Duration(seconds: 15),
-        pauseFor: Duration(milliseconds: 1500),
+        pauseFor: Duration(seconds: 5), // 예를 들어 pauseFor 값을 3초로 조정
         localeId: 'ko_KR',
       );
     } else {
@@ -155,7 +154,7 @@ class _ChatPageState extends State<ChatPage> {
             ));
             currentGifUrl = newGifUrl;
           });
-          //print("Selected new GIF URL: $newGifUrl");
+          print("Selected new GIF URL: $newGifUrl");
 
           if (voiceUrl != null && voiceUrl is String && voiceUrl.isNotEmpty) {
             // voiceUrl이 유효하면 오디오 재생
@@ -199,7 +198,7 @@ class _ChatPageState extends State<ChatPage> {
                       height: 580.0, // 이미지의 높이
                       fit: BoxFit.cover, // 이미지를 화면에 맞게 조정합니다.
                     ),
-                ),
+                  ),
                 ListView.builder(
                   reverse: true,
                   padding: const EdgeInsets.all(30.0),
@@ -267,6 +266,3 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 }
-
-
-

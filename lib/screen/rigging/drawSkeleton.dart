@@ -55,8 +55,8 @@ class _SkeletonCanvasState extends State<SkeletonCanvas> {
     // final arrangeCenterX = screenSize.width / 2 - conSizeX / 2;
     // final arrangeCenterY = screenSize.height / 2 - conSizeY / 2 - 
     //    150; // todo 150 으로 하드 코딩한 부분 해결하는 로직 고민
-    final double arrangeCenterX = 402;
-    final double arrangeCenterY = 130;
+    final double arrangeCenterX = 390;
+    final double arrangeCenterY = 40;
 
     return Container(
       color: colorMainBG_greedot,
