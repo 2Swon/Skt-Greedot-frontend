@@ -106,7 +106,7 @@ class _ChatPageState extends State<ChatPage> {
             _onSpeechResult(result.recognizedWords);
           }
         },
-        listenFor: Duration(seconds: 15),
+        //listenFor: Duration(seconds: 15),
         pauseFor: Duration(milliseconds: 1500),
         localeId: 'ko_KR',
       );
@@ -237,24 +237,31 @@ class _ChatPageState extends State<ChatPage> {
           SizedBox(height: 50),
           AvatarGlow(
             animate: isListening,
-            duration: const Duration(milliseconds: 2000),
-            repeat: true,
             glowColor: Colors.grey,
-            child: FloatingActionButton(
-              backgroundColor: colorBut_greedot,
-              onPressed: () {
+            //endRadius: 75.0,
+            duration: const Duration(milliseconds: 2000),
+            //repeatPauseDuration: const Duration(milliseconds: 100),
+            repeat: true,
+            child: GestureDetector(
+              onLongPressStart: (details) => _startListening(),
+              onLongPressEnd: (details) {
                 if (isListening) {
                   speechToText.stop();
                   setState(() => isListening = false);
-                } else {
-                  _startListening();
                 }
               },
-              child: Icon(isListening ? Icons.mic : Icons.mic_none,
-                  color: Colors.white),
+              child: FloatingActionButton(
+                onPressed: () {
+                  // 일반 탭 동작
+                },
+                child: Icon(
+                  isListening ? Icons.mic : Icons.mic_none,
+                  color: Colors.white,
+                ),
+                backgroundColor: colorBut_greedot,
+              ),
             ),
           ),
-          SizedBox(height: 50),
         ],
       ),
     );
