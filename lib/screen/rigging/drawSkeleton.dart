@@ -40,7 +40,9 @@ class _SkeletonCanvasState extends State<SkeletonCanvas> {
 
   double conSizeX = 400;
   double conSizeY = 400;
-
+  
+  final GlobalKey _containerKey = GlobalKey();
+  Offset? offset;
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +50,13 @@ class _SkeletonCanvasState extends State<SkeletonCanvas> {
     final screenSize = MediaQuery
         .of(context)
         .size;
-    final arrangeCenterX = screenSize.width / 2 - conSizeX / 2;
-    final arrangeCenterY = screenSize.height / 2 - conSizeY / 2 -
-        150; // todo 150 으로 하드 코딩한 부분 해결하는 로직 고민
+
+    //좌상단 이미지 좌표 구하기 
+    // final arrangeCenterX = screenSize.width / 2 - conSizeX / 2;
+    // final arrangeCenterY = screenSize.height / 2 - conSizeY / 2 - 
+    //    150; // todo 150 으로 하드 코딩한 부분 해결하는 로직 고민
+    final double arrangeCenterX = 402;
+    final double arrangeCenterY = 130;
 
     return Container(
       color: colorMainBG_greedot,
@@ -84,8 +90,8 @@ class _SkeletonCanvasState extends State<SkeletonCanvas> {
                     moveX = updateDragDetails.localPosition.dx -
                         skeletonInfo[index].point.dx;
                     moveY = updateDragDetails.localPosition.dy -
-                        skeletonInfo[index].point
-                            .dy; // moveX, moveY 시작위치와 현재위치의 차이 구함
+                        skeletonInfo[index].point.dy;
+                             // moveX, moveY 시작위치와 현재위치의 차이 구함
                     _initState = false;
                   }
                   newPosX = updateDragDetails.localPosition.dx - moveX;
@@ -133,17 +139,40 @@ class _SkeletonCanvasState extends State<SkeletonCanvas> {
   Widget _buildPhotoArea() {
     return widget.imageUrl!.isNotEmpty
         ? Container(
+      key: _containerKey,
       width: conSizeX,
       height: conSizeY,
       child: Image.network(
           widget.imageUrl!, fit: BoxFit.cover), // Image.network를 사용하여 이미지 표시
     )
         : Container(
+      key: _containerKey,
       width: conSizeX,
       height: conSizeY,
       color: Colors.grey, // imageUrl이 비어있는 경우 회색 배경 표시
     );
   }
+
+  // 중앙 위치 구하기
+  Offset? _getOffset() {
+    if (_containerKey.currentContext != null) {
+      final RenderBox renderBox =
+          _containerKey.currentContext!.findRenderObject() as RenderBox;
+      Offset offset = renderBox.localToGlobal(Offset.zero);
+      return offset;
+    }
+  }
+    @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        offset = _getOffset();
+        print('offset : $offset');
+      });
+    });
+  }
+
 }
 
 class LinePainter extends CustomPainter {
@@ -158,7 +187,7 @@ class LinePainter extends CustomPainter {
     final paint = Paint()
       ..color = Colors.black
       ..strokeWidth = 2;
-
+    print('offset_origin : $arrangeCenterX , $arrangeCenterY');
     for (Joint fromJ in skeletonInfo) {
       //Node 객체들이 들어 있으며, 각 Node는 연결점을 나타냄
       String currentJoint = fromJ.fromJoint;
