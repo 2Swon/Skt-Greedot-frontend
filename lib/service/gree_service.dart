@@ -9,6 +9,8 @@ import 'dart:convert';
 import 'package:mime_type/mime_type.dart';
 import 'package:logger/logger.dart';
 import '../models/gree_model.dart';
+import 'dart:convert';
+
 
 class ApiServiceGree {
   static final Logger _logger = Logger();
@@ -91,12 +93,15 @@ class ApiServiceGree {
     );
 
     if (response.statusCode == 200) {
-      List jsonResponse = json.decode(response.body);
+      // 서버로부터 받은 응답의 바디를 utf-8로 디코딩합니다.
+      var decodedBody = utf8.decode(response.bodyBytes);
+      List jsonResponse = json.decode(decodedBody);
       return jsonResponse.map((data) => Gree.fromJson(data)).toList();
     } else {
       throw Exception('Failed to load grees.');
     }
   }
+
 
 
   static Future<dynamic> readGree(int greeId) async {

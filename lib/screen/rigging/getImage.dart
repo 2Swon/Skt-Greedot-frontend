@@ -34,17 +34,42 @@ class _getImageState extends State<GetImage_greedot> {
   Widget build(BuildContext context) {
     return Container(
       color: colorMainBG_greedot,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          const SizedBox(height: 30, width: double.infinity),
-          _buildPhotoArea(),
-          const SizedBox(height: 20),
-          _buildButton(),
+          Positioned(
+            left: 50, // 왼쪽에서 50의 위치에
+            bottom: 400, // 아래에서 400의 위치에
+            child: Image.asset(
+              'assets/images/cute_element/flower1.png', // 꽃 이미지 추가
+              width: 200,
+              height: 200,
+            ),
+          ),
+          Positioned(
+            right: 0, // 오른쪽 끝에
+            bottom: 0, // 아래 끝에
+            child: Image.asset(
+              'assets/images/cute_element/tulip.png', // 개 이미지 추가
+              width: 400,
+              height: 400,
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center, // 세로 방향으로 중앙 정렬
+            crossAxisAlignment: CrossAxisAlignment.center, // 가로 방향으로 중앙 정렬
+            children: [
+              const SizedBox(height: 30),
+              _buildPhotoArea(),
+              const SizedBox(height: 20),
+              _buildButton(),
+            ],
+          ),
+
         ],
       ),
     );
   }
+
 
   //이미지를 가져오는 함수
   Future getImage(ImageSource imageSource) async {
@@ -114,19 +139,26 @@ class _getImageState extends State<GetImage_greedot> {
       child: Container(
         width: canvasSize,
         height: canvasSize,
-        decoration: _image != null
-            ? BoxDecoration(
-                image: DecorationImage(
-                  image: FileImage(File(_image!.path)), // 이미지 파일을 화면에 띄워줍니다.
-                  fit: BoxFit.cover, // 이미지가 컨테이너를 꽉 채우도록 설정합니다.
-                ),
-              )
-            : BoxDecoration(
-                color: Colors.white60, // 이미지가 없을 경우 회색 배경을 표시합니다.
-              ),
+        decoration: BoxDecoration(
+          // 모서리를 둥글게 처리하기 위해 borderRadius를 추가합니다.
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(
+            color: Colors.grey, // 경계선의 색상을 지정합니다.
+            width: 2.0, // 경계선의 너비를 지정합니다.
+          ),
+          // _image가 null이 아닐 때와 null일 때를 구분하여 처리합니다.
+          image: _image != null
+              ? DecorationImage(
+            image: FileImage(File(_image!.path)), // 이미지 파일을 화면에 띄워줍니다.
+            fit: BoxFit.cover, // 이미지가 컨테이너를 꽉 채우도록 설정합니다.
+          )
+              : null,
+          color: _image == null ? Colors.white60 : null, // 이미지가 없을 경우 회색 배경을 표시합니다.
+        ),
       ),
     );
   }
+
 
   Widget _buildButton() {
     double buttonWidth = 170;
