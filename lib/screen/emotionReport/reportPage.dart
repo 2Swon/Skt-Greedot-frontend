@@ -38,44 +38,23 @@ class _ReportPageState extends State<ReportPage> {
   @override
   void initState() {
     super.initState();
-    fetchEmotionData().then((_) { // Emotion Data를 먼저 가져온다.
-      Future.delayed(Duration(seconds: 1), () { // Emotion Data 호출이 완료된 후 5초 대기한다.
-        fetchSummary().then((_) { // Summary 호출
-          Future.delayed(Duration(seconds: 1), () { // Summary 호출이 완료된 후 5초 대기한다.
-            fetchDialogLogs(); // 마지막으로 Dialog Logs 호출
-          });
-        });
-      });
-    });
+    initializeData();
   }
 
-
-
-  Future<void> fetchEmotionData() async {
+  Future<void> initializeData() async {
+    if (widget.greeId == null) {
+      print('Gree ID is null');
+      return;
+    }
     try {
-      if (widget.greeId == null) {
-        throw Exception('% greeId is null');
-      }
-
-      List<String> sentences = await ApiServiceGree.fetchSentences(widget.greeId!);
-      if (sentences.isEmpty) {
-        throw Exception('% No sentences returned');
-      }
-
-      var report = await ApiServiceGree.makeEmotionReport(sentences, widget.greeId!);
-      if (report == null) {
-        throw Exception('% Report generation failed');
-      }
-
-      setState(() {
-        emotions = report['emotions'].map((emotion, sentences) =>
-            MapEntry(emotion, List<String>.from(sentences))).cast<String, List<String>>();
-        urls = report['urls'].cast<String, String>();
-      });
+      await fetchEmotionData(); // Emotion Data를 먼저 가져온다.
+      await fetchSummary(); // 그 다음 Summary 호출
+      await fetchDialogLogs(); // 마지막으로 Dialog Logs 호출
     } catch (e) {
-      print('% Error fetching emotion data: $e');
+      print('Error during data fetching: $e');
     }
   }
+
 
   Future<void> fetchDialogLogs() async {
     if (widget.greeId == null) {
@@ -91,6 +70,31 @@ class _ReportPageState extends State<ReportPage> {
       print('Error fetching dialog logs: $e');
     }
   }
+
+
+  Future<void> fetchEmotionData() async {
+    try {
+      List<String> sentences = await ApiServiceGree.fetchSentences(widget.greeId!);
+      if (sentences.isEmpty) {
+        throw Exception('No sentences returned');
+      }
+
+      var report = await ApiServiceGree.makeEmotionReport(sentences, widget.greeId!);
+      if (report == null) {
+        throw Exception('Report generation failed');
+      }
+
+      setState(() {
+        emotions = report['emotions'].map((emotion, sentences) =>
+            MapEntry(emotion, List<String>.from(sentences))).cast<String, List<String>>();
+        urls = report['urls'].cast<String, String>();
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+      // 에러 처리 로직 (예: 상태 업데이트, 사용자에게 메시지 표시)
+    }
+  }
+
 
   Future<void> fetchSummary() async {
     if (widget.greeId == null) {
