@@ -236,21 +236,38 @@ class ApiServiceGree {
   }
 
   static Future<Map<String, dynamic>> makeEmotionReport(List<String> sentences, int greeId) async {
-    final url = Uri.parse(
-        '$baseUrl/api/v1/ai/make-emotion-report/$greeId');
+    final url = Uri.parse('$baseUrl/api/v1/ai/make-emotion-report/$greeId');
+    print('Requesting URL: $url');
+
+    final requestBody = json.encode({'sentences': sentences});
+    print('Request Body: $requestBody');
+
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'sentences': sentences}),
+      body: requestBody,
     );
-    if (response.statusCode == 200) {
-      print('% make report success');
-      return json.decode(utf8.decode(response.bodyBytes));
-    } else {
-      // 오류 처리
-      throw Exception('% Failed to make emotion report');
+
+    print('Response Status Code: ${response.statusCode}');
+    try {
+      final decodedBody = utf8.decode(response.bodyBytes);
+      print('Response Body: $decodedBody');
+      if (response.statusCode == 200) {
+        print('make report success');
+        return json.decode(decodedBody);
+      } else {
+        // 상태 코드가 200이 아닌 경우, 서버 응답 본문을 사용하여 예외를 발생시킵니다.
+        throw Exception('Failed to make emotion report - Status Code: ${response.statusCode}, Body: $decodedBody');
+      }
+    } catch (e) {
+      // 디코딩 과정에서 발생하는 예외를 처리합니다.
+      print('Error during response processing: $e');
+      throw Exception('Error during response processing - Status Code: ${response.statusCode}, Error: $e');
     }
+
   }
+
+
 
   static Future<List<Map<String, dynamic>>> fetchDialogLogs(int greeId) async {
     final url = Uri.parse('$baseUrl/api/v1/log/gree/$greeId');
@@ -261,6 +278,31 @@ class ApiServiceGree {
       throw Exception('Failed to load dialog logs');
     }
   }
+
+  static Future<String> fetchSummary(int greeId) async {
+    // URL을 수정하여 함수명과 일치시키고, 충돌 가능성을 줄임
+    final Uri url = Uri.parse('http://20.196.198.166:8001/emotion-summary/$greeId');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Accept': 'application/json'}, // 헤더의 키를 표준에 맞게 수정
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+        print('Emotion summary load success'); // 성공 로그 추가
+        return data['summary'];
+      } else {
+        print('Failed to load emotion summary: ${response.statusCode}'); // 실패 로그에 상태 코드 추가
+        throw Exception('Failed to load emotion summary with status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 네트워크 요청 중 발생할 수 있는 예외를 처리
+      print('Error fetching emotion summary: $e');
+      throw Exception('Error fetching emotion summary: $e');
+    }
+  }
+
 
   static Future<String?> fetchSpecificGreeGif(int greeId) async {
     final url = Uri.parse('$baseUrl/api/v1/gree/getgif/$greeId');
@@ -352,5 +394,4 @@ class ApiServiceGree {
     }
   }
 }
-
 
