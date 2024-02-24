@@ -58,6 +58,7 @@ dependencies:
   flutter_sound: ^9.2.13
   permission_handler: ^10.0.0 # 적절한 최신 버전을 확인하세요
   flutter_dotenv: ^5.0.2 # 이 버전은 예시이므로, 최신 버전을 확인해주세요.
+  audioplayers: ^5.2.1
 
 
 
