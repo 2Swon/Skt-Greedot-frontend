@@ -89,7 +89,7 @@ flutter:
     - assets/images/
     - assets/images/loading_gif/
     - assets/images/cute_element/
-    - .envtest
+    - .env
 
   #   - images/a_dot_ham.jpeg
 
