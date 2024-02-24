@@ -17,6 +17,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:audioplayers/audioplayers.dart' as audio_players;
 
+import '../chat/gifPlayer.dart';
+
 // Naver API 클라이언트 정보
 String clientId = dotenv.env['NAVER_CLIENT_ID']!;
 String clientSecret = dotenv.env['NAVER_CLIENT_SECRET']!;
@@ -90,13 +92,19 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
   }
-
+  // gif마다 원하는 여러 키워드 입력
   void createKeywordMapping() {
-    List<String> koreanKeywords = ['걷', '춤', '안녕']; // 한글 키워드 목록
+    List<List<String>> koreanKeywords = [
+      ['걷','걸'],
+      ['춤','댄스'],
+      ['안녕','인사']
+    ];
     List<String> keys = keywordToGifUrl.keys.toList();
 
     for (int i = 0; i < keys.length; i++) {
-      keywordMapping[koreanKeywords[i]] = keys[i];
+      for (String koreanKeywords in koreanKeywords[i]) {
+        keywordMapping[koreanKeywords[i]] = keywordToGifUrl.keys.elementAt(i);
+      }
     }
     print("keywordMapping contents: $keywordMapping");
   }
@@ -128,9 +136,23 @@ class _ChatPageState extends State<ChatPage> {
           final chatResponse = decodedResponse['chat_response'];
           final gptTalkContent = chatResponse['gpt_talk']['content'];
           final gptTalkVoiceUrl = chatResponse['gpt_talk']['voice_url'];
+
+          String newGifUrl = currentGifUrl;
+          for (var keyword in keywordMapping.keys) {
+            if (gptTalkContent.contains(keyword)) {
+              String mappedKeyword = keywordMapping[keyword]!;
+              newGifUrl = keywordToGifUrl[mappedKeyword] ?? currentGifUrl;
+
+              print("Found keyword: $keyword, updating GIF to $newGifUrl"); // 디버깅 로그
+
+              break; // 첫 번째 일치하는 키워드에서 멈춤
+            }
+          }
+
           // API로부터 받은 메시지를 상태에 추가합니다.
           setState(() {
             messages.add(ChatMessage(messageContent: gptTalkContent, isUser: false));
+            currentGifUrl = newGifUrl;
           });
 
           // URL을 AudioSource로 변환하여 오디오 재생
@@ -255,11 +277,11 @@ class _ChatPageState extends State<ChatPage> {
                 else // GIF가 준비되었을 때만 GifPlayer 표시
                   Align(
                     alignment: Alignment.center,
-                    child: Image.network(
-                      currentGifUrl.isNotEmpty ? currentGifUrl : 'https://some-default-url/default.gif',
+                    child: GifPlayer(
+                      gifUrl: currentGifUrl.isNotEmpty ? currentGifUrl : 'https://some-default-url/default.gif',
                       width: 580.0, // 이미지의 너비
                       height: 580.0, // 이미지의 높이
-                      fit: BoxFit.cover, // 이미지를 화면에 맞게 조정합니다.
+                      fit: BoxFit.cover,  // 이미지를 화면에 맞게 조정합니다.
                     ),
                   ),
                 ListView.builder(
