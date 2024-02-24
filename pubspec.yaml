@@ -55,6 +55,12 @@ dependencies:
   logger: ^1.2.2
   fl_chart: ^0.60.0
   just_audio: ^0.9.14
+  flutter_sound: ^9.2.13
+  permission_handler: ^10.0.0 # 적절한 최신 버전을 확인하세요
+  flutter_dotenv: ^5.0.2 # 이 버전은 예시이므로, 최신 버전을 확인해주세요.
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +89,7 @@ flutter:
     - assets/images/
     - assets/images/loading_gif/
     - assets/images/cute_element/
+    - .envtest
 
   #   - images/a_dot_ham.jpeg
 

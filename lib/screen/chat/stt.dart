@@ -1,18 +1,23 @@
 import 'dart:convert';
 
-import 'package:just_audio/just_audio.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
-import 'package:projectfront/screen/chat/gifPlayer.dart';
 import 'package:projectfront/widget/design/settingColor.dart';
-import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import '../../service/user_service.dart';
-import '../../widget/design/settingColor.dart';
-
-import '../../widget/design/settingColor.dart';
 import '../../service/gree_service.dart';
-import '../../screen/chat/stt.dart';
+
+import 'dart:io';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+// Naver API 클라이언트 정보
+String clientId = dotenv.env['NAVER_CLIENT_ID']!;
+String clientSecret = dotenv.env['NAVER_CLIENT_SECRET']!;
 
 class ChatMessage {
   String messageContent;
@@ -31,7 +36,6 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final SpeechToText speechToText = SpeechToText();
   var text = "Hold the button and speak";
-  var isListening = false;
   List<ChatMessage> messages = [];
   Map<String, String> keywordToGifUrl = {};
   Map<String, String> keywordMapping = {};
@@ -40,9 +44,16 @@ class _ChatPageState extends State<ChatPage> {
 
   bool _isLoadingGif = true;
 
+  final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
+  bool _isRecorderInitialized = false;
+  var isListening = false;
+
+
+
   @override
   void initState() {
     super.initState();
+    _initRecorder();
     if (widget.greeId != null) {
       loadGifsAndUpdateMap(widget.greeId!); // 위젯 초기화 시 GIF 목록 로드
     } else {
@@ -52,6 +63,12 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
   }
+
+  Future<void> _initRecorder() async {
+    await _recorder.openRecorder();
+    _isRecorderInitialized = true;
+  }
+
 
 
   void loadGifsAndUpdateMap(int greeId) async {
@@ -93,74 +110,25 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void _startListening() async {
-    bool available = await speechToText.initialize(
-      onError: (val) => print('Error: $val'),
-      onStatus: (val) => print('Status: $val'),
-    );
-    if (available) {
-      setState(() => isListening = true);
-      speechToText.listen(
-        onResult: (result) {
-          if (result.finalResult) {
-            _onSpeechResult(result.recognizedWords);
-          }
-        },
-        pauseFor: Duration(seconds: 5), // 예를 들어 pauseFor 값을 3초로 조정
-        localeId: 'ko_KR',
-      );
-    } else {
-      setState(() => isListening = false);
-      print("The user has denied the use of speech recognition.");
-    }
-  }
-
 
   void _sendMessage(String message) async {
     print('Sending message with greeId: ${widget.greeId}');
-
     if (widget.greeId != null) {
       try {
         var response = await ApiService.GetChatBotMessage({
           'gree_id': widget.greeId!,
           'message': message
         });
-        print('Response received: ${jsonDecode(
-            utf8.decode(response.bodyBytes))}'); // 응답 로그
+        print('Response received: ${jsonDecode(utf8.decode(response.bodyBytes))}');
 
         if (response.statusCode == 200) {
           final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-          final gptTalkContent = decodedResponse['chat_response']['gpt_talk']['content'];
-          final voiceUrl = decodedResponse['chat_response']['gpt_talk']['voice_url'];
-
-          String newGifUrl = currentGifUrl;
-          for (var koreanKeyword in keywordMapping.keys) {
-            if (gptTalkContent.contains(koreanKeyword)) {
-              String? mappedKey = keywordMapping[koreanKeyword];
-              if (mappedKey != null && keywordToGifUrl.containsKey(mappedKey)) {
-                // 매핑된 영문 키워드로 URL 찾기
-                newGifUrl = keywordToGifUrl[mappedKey]!;
-                break;
-              }
-            }
-          }
-
-          AudioPlayer audioPlayer = AudioPlayer();
-
+          final chatResponse = decodedResponse['chat_response'];
+          final gptTalkContent = chatResponse['gpt_talk']['content'];
+          // API로부터 받은 메시지를 상태에 추가합니다.
           setState(() {
-            messages.add(ChatMessage(
-                messageContent: gptTalkContent,
-                isUser: false
-            ));
-            currentGifUrl = newGifUrl;
+            messages.add(ChatMessage(messageContent: gptTalkContent, isUser: false));
           });
-          print("Selected new GIF URL: $newGifUrl");
-
-          if (voiceUrl != null && voiceUrl is String && voiceUrl.isNotEmpty) {
-            // voiceUrl이 유효하면 오디오 재생
-            await audioPlayer.setUrl(voiceUrl);
-            await audioPlayer.play();
-          }
         } else {
           print('The request failed with status: ${response.statusCode}');
         }
@@ -172,6 +140,92 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
   }
+
+
+  Future<void> _startRecording() async {
+    if (!_isRecorderInitialized) return;
+
+    // 오디오 녹음 권한 요청
+    var status = await Permission.microphone.status;
+    if (!status.isGranted) {
+      await Permission.microphone.request();
+    }
+
+    // 권한이 부여된 후에 녹음 시작
+    status = await Permission.microphone.status;
+    if (status.isGranted) {
+      Directory appDirectory = await getApplicationDocumentsDirectory();
+      String filePath = '${appDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.aac';
+
+      await _recorder.startRecorder(
+        toFile: filePath,
+        codec: Codec.aacADTS,
+      );
+      setState(() => isListening = true);
+    } else {
+      print("The user has denied the use of recording.");
+    }
+  }
+
+
+
+  // 녹음 중지 및 Naver 음성 인식 API 호출
+  Future<void> _stopAndRecognizeSpeech() async {
+    var recording = await _recorder.stopRecorder();
+    setState(() => isListening = false);
+
+    if (recording != null) {
+      File voiceFile = File(recording);
+      try {
+        var response = await _sendVoiceToNaver(voiceFile);
+        if (response.statusCode == 200) {
+          print("Success: ${response.body}");
+          final jsonResponse = jsonDecode(response.body);
+          final text = jsonResponse['text']; // STT 응답으로부터 텍스트 추출
+          if (text != null) {
+            setState(() {
+              messages.add(ChatMessage(messageContent: text, isUser: true));
+            });
+            _sendMessage(text); // 추출된 텍스트를 이용하여 _sendMessage 호출
+          }
+        } else {
+          print("Error: ${response.body}");
+        }
+      } catch (e) {
+        print("Error calling Naver Speech-to-Text API: $e");
+      }
+    }
+  }
+
+
+  @override
+  void dispose() {
+    _recorder.closeRecorder();
+    super.dispose();
+  }
+
+  // Naver 음성 인식 API 호출
+  Future<http.Response> _sendVoiceToNaver(File voiceFile) {
+    String url = "https://naveropenapi.apigw.ntruss.com/recog/v1/stt?lang=Kor";
+    Map<String, String> headers = {
+      "X-NCP-APIGW-API-KEY-ID": clientId,
+      "X-NCP-APIGW-API-KEY": clientSecret,
+      "Content-Type": "application/octet-stream",
+    };
+    return http.post(Uri.parse(url), headers: headers, body: voiceFile.readAsBytesSync());
+  }
+
+  // 기존의 _startListening 함수를 변경합니다.
+  void _startListening() async {
+    await _startRecording();
+    // Naver 음성 인식 API로부터 결과를 받은 후 처리할 로직을 여기에 구현합니다.
+    // 예를 들어, 음성 녹음을 일정 시간 후에 자동으로 중지하려면 Future.delayed를 사용할 수 있습니다.
+    Future.delayed(Duration(seconds: 5), () {
+      _stopAndRecognizeSpeech();
+    });
+  }
+
+
 
 
 
@@ -206,30 +260,23 @@ class _ChatPageState extends State<ChatPage> {
                   itemBuilder: (context, index) {
                     final message = messages[messages.length - 1 - index];
                     return Align(
-                      // 사용자 메시지는 오른쪽, 봇 메시지는 왼쪽 정렬
-                      alignment: message.isUser
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
+                      alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
                       child: Container(
-                        margin: EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 10),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 15),
+                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                         decoration: BoxDecoration(
-                          color: message.isUser ? colorBut_greedot : Colors
-                              .grey[300],
+                          color: message.isUser ? colorBut_greedot : Colors.grey[300],
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           message.messageContent,
-                          style: TextStyle(
-                              color: message.isUser ? Colors.white : Colors
-                                  .black,fontFamily:'greedot_font'),
+                          style: TextStyle(color: message.isUser ? Colors.white : Colors.black),
                         ),
                       ),
                     );
                   },
                 ),
+
               ],
             ),
           ),

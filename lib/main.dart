@@ -2,10 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:projectfront/provider/pageNavi.dart';
 import 'package:projectfront/screen/rigging/drawSkeletonNavi.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'screen/loading/startApp.dart';
 
-void main() => runApp(NavigationBarApp());
+Future main() async {
+  // .env 파일을 불러오기 전에 필요한 초기 설정
+  WidgetsFlutterBinding.ensureInitialized();
+  // .env 파일 불러오기
+  await dotenv.load(fileName: ".env");
+
+  runApp(NavigationBarApp());
+}
 
 class NavigationBarApp extends StatelessWidget {
   NavigationBarApp({super.key});
