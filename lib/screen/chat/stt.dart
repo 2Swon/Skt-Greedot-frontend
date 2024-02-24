@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:projectfront/widget/design/settingColor.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import '../../service/user_service.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:audioplayers/audioplayers.dart' as audio_players;
 
 // Naver API 클라이언트 정보
 String clientId = dotenv.env['NAVER_CLIENT_ID']!;
@@ -29,6 +31,7 @@ class ChatMessage {
 class ChatPage extends StatefulWidget {
   final int? greeId;
   const ChatPage({Key? key, this.greeId}) : super(key: key);
+
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -47,8 +50,7 @@ class _ChatPageState extends State<ChatPage> {
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   bool _isRecorderInitialized = false;
   var isListening = false;
-
-
+  final audioPlayer = AudioPlayer(); // AudioPlayer 인스턴스 생성
 
   @override
   void initState() {
@@ -125,10 +127,16 @@ class _ChatPageState extends State<ChatPage> {
           final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
           final chatResponse = decodedResponse['chat_response'];
           final gptTalkContent = chatResponse['gpt_talk']['content'];
+          final gptTalkVoiceUrl = chatResponse['gpt_talk']['voice_url'];
           // API로부터 받은 메시지를 상태에 추가합니다.
           setState(() {
             messages.add(ChatMessage(messageContent: gptTalkContent, isUser: false));
           });
+
+          // URL을 AudioSource로 변환하여 오디오 재생
+          final source = AudioSource.uri(Uri.parse(gptTalkVoiceUrl)); // 별칭 사용
+          await audioPlayer.setAudioSource(source);
+          await audioPlayer.play();
         } else {
           print('The request failed with status: ${response.statusCode}');
         }
@@ -140,6 +148,7 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
   }
+
 
 
   Future<void> _startRecording() async {
