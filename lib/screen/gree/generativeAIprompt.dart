@@ -9,6 +9,7 @@ import '../../widget/design/basicButtons.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import '../../widget/design/settingColor.dart';
+import '../loading/loadingGif.dart';
 
 class GenerativeAIprompt extends StatelessWidget {
   final double paddingValue = 30.0;
@@ -18,6 +19,9 @@ class GenerativeAIprompt extends StatelessWidget {
   final int? greeId;
 
   GenerativeAIprompt({Key? key, this.greeId}) : super(key: key);
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +77,7 @@ class GenerativeAIprompt extends StatelessWidget {
                           EleButton_greedot(
                             buttonText: '원본 유지',
                             additionalFunc: () {
-                              pageNavi.changePage('GenerativeAI',data: PageData(greeId: greeId, greeStyle: 1));
+                              pageNavi.changePage('GenerativeAI', data: PageData(greeId: greeId, greeStyle: 1));
                             },
                           ),
                           SizedBox(height: buttonSpacing), // Use height for vertical spacing
