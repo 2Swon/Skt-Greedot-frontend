@@ -105,7 +105,7 @@ void showLoadingDialog(BuildContext context) {
               children: [
                 CircularProgressIndicator(), // 로딩 인디케이터
                 SizedBox(width: 20), // 인디케이터와 텍스트 사이의 간격
-                Text("생성 중입니다..."), // 로딩 텍스트
+                Text("생성 중입니다...(약 1분20초 소요)"), // 로딩 텍스트
               ],
             ),
           ],

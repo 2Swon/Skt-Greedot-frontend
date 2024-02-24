@@ -7,7 +7,9 @@ import 'package:provider/provider.dart';
 import '../../provider/pageNavi.dart';
 import '../../service/gree_service.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
+import 'package:path/path.dart' as Path;
+
+import '../loading/loadingGif.dart';
 
 class GenerativeAI extends StatefulWidget {
   final int? greeId;
@@ -25,16 +27,53 @@ class _GenerativeAIState extends State<GenerativeAI> {
   int? selectedImageIndex;
   bool _isLoading = true;
 
+  void showLoadingDialog(BuildContext context) {
+    // 로딩 다이얼로그 표시
+    showDialog(
+      context: context,
+      barrierDismissible: false, // 사용자가 다이얼로그 밖을 터치하여 닫을 수 없도록 설정
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0), // 다이얼로그 내부의 여백 조정
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // 내용물 크기에 맞게 Column 크기 조정
+              children: <Widget>[
+                LoadingGifWidget(), // 로딩 GIF 위젯
+                SizedBox(height: 20), // GIF와 텍스트 사이의 간격
+                CircularProgressIndicator(), // 로딩 스피너
+                SizedBox(height: 20), // 텍스트와 스피너 사이의 간격
+                Text(
+                  "AI 그림을 생성 중입니다...(약 1분 소요)", // 로딩 메시지
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16.0, // 텍스트 크기 조정
+                  ),
+                ),
+              ],
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0), // 다이얼로그 모서리 둥글게 처리
+          ),
+        );
+      },
+    );
+  }
+
+
   @override
   void initState() {
     super.initState();
-    _fetchImages();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchImages();
+    });
   }
 
   void _fetchImages() async {
+    showLoadingDialog(context); // 로딩 다이얼로그를 먼저 표시
     try {
-      List<String> images =
-      await ApiServiceGree.fetchUploadedImages(widget.greeId!, widget.greeStyle!);
+      List<String> images = await ApiServiceGree.fetchUploadedImages(widget.greeId!, widget.greeStyle!);
       setState(() {
         uploadedImageUrls = images;
         _isLoading = false;
@@ -44,8 +83,11 @@ class _GenerativeAIState extends State<GenerativeAI> {
         _isLoading = false;
         print("Error fetching images: $e");
       });
+    } finally {
+      Navigator.of(context, rootNavigator: true).pop('dialog'); // 작업이 완료되면 다이얼로그 닫기
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +196,7 @@ class _GenerativeAIState extends State<GenerativeAI> {
       final response = await http.get(Uri.parse(imageUrl));
       if (response.statusCode == 200) {
         final directory = await getTemporaryDirectory();
-        final filePath = join(directory.path, 'downloadedImage.png');
+        final filePath = Path.join(directory.path, 'downloadedImage.png');
         final file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
         return file;
