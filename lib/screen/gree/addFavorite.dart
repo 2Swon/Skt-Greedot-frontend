@@ -41,8 +41,8 @@ class _FavoriteItemCardState extends State<FavoriteItemCard> {
   Widget build(BuildContext context) {
     final pageNavi = Provider.of<PageNavi>(context, listen: false);
     return Scaffold(
-      backgroundColor: colorNaviBar_greedot,
-      body:SingleChildScrollView(
+        backgroundColor: colorNaviBar_greedot,
+        body:SingleChildScrollView(
           child: Stack(
             children: [
               AspectRatio(
@@ -155,7 +155,7 @@ class _FavoriteItemCardState extends State<FavoriteItemCard> {
               ),
             ],
           ),
-      )
+        )
     );
   }
 }

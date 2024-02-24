@@ -24,58 +24,37 @@ class _ReportPageState extends State<ReportPage> {
   Map<String, List<String>> emotions = {}; // 초기 상태는 비어있음
   Map<String, String> urls = {};
   List<Map<String, dynamic>> dialogLogs = [];
+  String summary = "";
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchEmotionData();
+  //   fetchDialogLogs();
+  //   fetchSummary();
+  // }
+
 
   @override
   void initState() {
     super.initState();
-    fetchEmotionData();
-    fetchDialogLogs();
+    initializeData();
   }
 
-  // Future<void> fetchDialogLogs() async {
-  //   if (widget.greeId == null) {
-  //     print('Gree ID is null');
-  //     return;
-  //   }
-  //   try {
-  //     final response = await http.get(Uri.parse('http://20.196.198.166:8000/api/v1/log/gree/1'));
-  //     if (response.statusCode == 200) {
-  //       setState(() {
-  //         dialogLogs = List<Map<String, dynamic>>.from(json.decode(utf8.decode(response.bodyBytes)));
-  //       });
-  //     } else {
-  //       throw Exception('Failed to load dialog logs');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching dialog logs: $e');
-  //   }
-  // }
-
-  Future<void> fetchEmotionData() async {
+  Future<void> initializeData() async {
+    if (widget.greeId == null) {
+      print('Gree ID is null');
+      return;
+    }
     try {
-      if (widget.greeId == null) {
-        throw Exception('% greeId is null');
-      }
-
-      List<String> sentences = await ApiServiceGree.fetchSentences(widget.greeId!);
-      if (sentences.isEmpty) {
-        throw Exception('% No sentences returned');
-      }
-
-      var report = await ApiServiceGree.makeEmotionReport(sentences, widget.greeId!);
-      if (report == null) {
-        throw Exception('% Report generation failed');
-      }
-
-      setState(() {
-        emotions = report['emotions'].map((emotion, sentences) =>
-            MapEntry(emotion, List<String>.from(sentences))).cast<String, List<String>>();
-        urls = report['urls'].cast<String, String>();
-      });
+      await fetchEmotionData(); // Emotion Data를 먼저 가져온다.
+      await fetchSummary(); // 그 다음 Summary 호출
+      await fetchDialogLogs(); // 마지막으로 Dialog Logs 호출
     } catch (e) {
-      print('% Error fetching emotion data: $e');
+      print('Error during data fetching: $e');
     }
   }
+
 
   Future<void> fetchDialogLogs() async {
     if (widget.greeId == null) {
@@ -89,6 +68,46 @@ class _ReportPageState extends State<ReportPage> {
       });
     } catch (e) {
       print('Error fetching dialog logs: $e');
+    }
+  }
+
+
+  Future<void> fetchEmotionData() async {
+    try {
+      List<String> sentences = await ApiServiceGree.fetchSentences(widget.greeId!);
+      if (sentences.isEmpty) {
+        throw Exception('No sentences returned');
+      }
+
+      var report = await ApiServiceGree.makeEmotionReport(sentences, widget.greeId!);
+      if (report == null) {
+        throw Exception('Report generation failed');
+      }
+
+      setState(() {
+        emotions = report['emotions'].map((emotion, sentences) =>
+            MapEntry(emotion, List<String>.from(sentences))).cast<String, List<String>>();
+        urls = report['urls'].cast<String, String>();
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+      // 에러 처리 로직 (예: 상태 업데이트, 사용자에게 메시지 표시)
+    }
+  }
+
+
+  Future<void> fetchSummary() async {
+    if (widget.greeId == null) {
+      print('Gree ID is null');
+      return;
+    }
+    try {
+      final response = await ApiServiceGree.fetchSummary(widget.greeId!); // gree_service.dart 파일에 해당 함수를 구현해야 함
+      setState(() {
+        summary = response;
+      });
+    } catch (e) {
+      print('Error fetching summary: $e');
     }
   }
 
@@ -135,7 +154,7 @@ class _ReportPageState extends State<ReportPage> {
         value: 100,
         title: '대화를 분석 중입니다',
         radius: 60,
-        titleStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
+        titleStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
       )];
     }
 
@@ -177,7 +196,7 @@ class _ReportPageState extends State<ReportPage> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(top: 40),
-                  child: Text('< 차트를 클릭하면 대화 로그가 보여요! >'),
+                  child: Text('< 차트를 클릭하면 대화 로그가 보여요! >', style: TextStyle(fontSize: 15.0,fontWeight: FontWeight.bold)),
                 ),
                 Container(
                   height: MediaQuery.of(context).size.height / 2,
@@ -193,7 +212,7 @@ class _ReportPageState extends State<ReportPage> {
                     Expanded( // 첫 번째 컨테이너를 Expanded로 감싸 화면의 절반을 차지하도록 합니다.
                       child: Column(
                         children: <Widget>[
-                          Text('< 전체 대화 로그 >'),
+                          Text('< 전체 대화 로그 >', style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
                           buildScrollableDialogLog(),
                         ],
                       ),
@@ -201,7 +220,7 @@ class _ReportPageState extends State<ReportPage> {
                     Expanded( // 두 번째 컨테이너도 Expanded로 감싸 화면의 나머지 절반을 차지하도록 합니다.
                       child: Column(
                         children: <Widget>[
-                          Text('< 하루 대화 요약 >'),
+                          Text('< 하루 대화 요약 >', style: TextStyle(fontSize: 13.0,fontWeight: FontWeight.bold)),
                           tempText(),
                         ],
                       ),
@@ -233,11 +252,8 @@ class _ReportPageState extends State<ReportPage> {
                     if (event is FlTapUpEvent && pieTouchResponse != null &&
                         pieTouchResponse.touchedSection != null) {
                       setState(() {
-                        // 여기서 touchedIndex를 설정할 때, 현재 터치된 섹션에 대한 인덱스를 올바르게 찾아야 합니다.
                         int currentIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                        // 감정 목록 중에서 실제로 표시된 감정만을 찾아서 인덱스를 조정합니다.
                         List<String> displayedEmotions = emotions.keys.where((key) => emotions[key]!.isNotEmpty).toList();
-                        // touchedIndex를 조정하기 위해 displayedEmotions 리스트에서 실제 인덱스를 찾습니다.
                         String touchedEmotion = displayedEmotions[currentIndex];
                         touchedIndex = emotions.keys.toList().indexOf(touchedEmotion);
                       });
@@ -249,15 +265,18 @@ class _ReportPageState extends State<ReportPage> {
                 sections: showingSections(),
               ),
             ),
-
           ),
-          if (touchedIndex != -1 && urls.isNotEmpty)
+          if (touchedIndex != -1 && urls.isNotEmpty) // 이미지를 로드하는 조건을 확인합니다.
             Expanded(
               child: Image.network(
                 urls[emotions.keys.elementAt(touchedIndex)] ?? '',
                 width: 70.0,
+                fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  return Image.asset('assets/images/greegirl_3.png', width: 70.0);
+                  // 로드 실패 시 콘솔에 에러 메시지 출력
+                  print("Image load failed: $error");
+                  // 대체 이미지 표시
+                  return Image.asset('assets/images/gree.png', width: 70.0);
                 },
               ),
             ),
@@ -265,6 +284,7 @@ class _ReportPageState extends State<ReportPage> {
       ),
     );
   }
+
 
   Widget buildScrollableEmotionSentences(String emotion) {
     List<String>? sentencesList = emotions[emotion];
@@ -358,8 +378,8 @@ class _ReportPageState extends State<ReportPage> {
       ),
       child: SingleChildScrollView(
         child: Text(
-          '아이는 친구와 적극적으로 소통하려는 모습을 보이며, 일상적인 인사, 놀이 제안, 장난스러운 도발 및 반응을 통해 다양한 감정과 행동을 표현했습니다. 대체로 활발하고 친구와의 상호작용을 즐기는 태도가 눈에 띕니다',
-          style: TextStyle(fontSize: 14.0, fontWeight:FontWeight.bold),
+          summary,
+          style: TextStyle(fontSize: 14.0),
         ),
       ),
     );

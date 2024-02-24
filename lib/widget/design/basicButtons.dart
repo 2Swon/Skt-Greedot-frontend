@@ -28,10 +28,12 @@ class EleButton_greedot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     // 버튼 디자인을 위한 색상과 그림자 효과 정의
     const Color buttonColor = colorBut_greedot; // 예시 색상
     const double elevation = 8.0; // 그림자 높이
     final Color shadowColor = Colors.black.withOpacity(0.5); // 그림자 색상
+
 
     final double buttonWidth = isSmall ? 70 : width;
     final double buttonHeight = isSmall ? 15 : height;
@@ -54,7 +56,7 @@ class EleButton_greedot extends StatelessWidget {
         ),
       ),
       onPressed: () {
-        additionalFunc?.call();
+        additionalFunc?.call(); // additionalFunc 호출 방식 간소화
         if (gotoScene != null) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => gotoScene!()));
         }
