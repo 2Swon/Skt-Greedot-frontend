@@ -77,7 +77,6 @@ app.*.map.json
 .pub/
 build/
 coverage/
-lib/generated_plugin_registrant.dart
 pubspec.lock
 ./pubspec.lock
 # For library packages, don’t commit the pubspec.lock file.
