@@ -10,6 +10,7 @@ class GifPlayer extends StatefulWidget {
     required this.gifUrl,
     required this.width,
     required this.height,
+    required BoxFit fit,
   }) : super(key: key);
 
   @override
