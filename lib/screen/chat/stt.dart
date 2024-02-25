@@ -17,8 +17,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:audioplayers/audioplayers.dart' as audio_players;
 
-import '../chat/gifPlayer.dart';
-
 // Naver API 클라이언트 정보
 String clientId = dotenv.env['NAVER_CLIENT_ID']!;
 String clientSecret = dotenv.env['NAVER_CLIENT_SECRET']!;
@@ -92,19 +90,13 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
   }
-  // gif마다 원하는 여러 키워드 입력
+
   void createKeywordMapping() {
-    List<List<String>> koreanKeywords = [
-      ['걷','걸'],
-      ['춤','댄스'],
-      ['안녕','인사']
-    ];
+    List<String> koreanKeywords = ['걷', '춤', '안녕']; // 한글 키워드 목록
     List<String> keys = keywordToGifUrl.keys.toList();
 
     for (int i = 0; i < keys.length; i++) {
-      for (String koreanKeywords in koreanKeywords[i]) {
-        keywordMapping[koreanKeywords[i]] = keywordToGifUrl.keys.elementAt(i);
-      }
+      keywordMapping[koreanKeywords[i]] = keys[i];
     }
     print("keywordMapping contents: $keywordMapping");
   }
@@ -277,11 +269,11 @@ class _ChatPageState extends State<ChatPage> {
                 else // GIF가 준비되었을 때만 GifPlayer 표시
                   Align(
                     alignment: Alignment.center,
-                    child: GifPlayer(
-                      gifUrl: currentGifUrl.isNotEmpty ? currentGifUrl : 'https://some-default-url/default.gif',
+                    child: Image.network(
+                      currentGifUrl.isNotEmpty ? currentGifUrl : 'https://some-default-url/default.gif',
                       width: 580.0, // 이미지의 너비
                       height: 580.0, // 이미지의 높이
-                      fit: BoxFit.cover,  // 이미지를 화면에 맞게 조정합니다.
+                      fit: BoxFit.cover, // 이미지를 화면에 맞게 조정합니다.
                     ),
                   ),
                 ListView.builder(
