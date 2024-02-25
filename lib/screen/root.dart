@@ -7,13 +7,13 @@ import '../screen/rigging/getImage.dart';
 import '../widget/design/settingColor.dart';
 import '../provider/pageNavi.dart';
 import '../screen/chat/stt.dart';
-import 'gree/generativeAI.dart';
+import './gree/generativeAI.dart';
 import './drawer/drawer.dart';
 import './rigging/drawSkeleton.dart';
-import '/screen/login/login.dart';
-import '/screen/login/memberRegister.dart';
-import '/screen/gree/favoriteList.dart';
-import 'personality/settingAge.dart';
+import '../screen/login/login.dart';
+import '../screen/login/memberRegister.dart';
+import '../screen/gree/favoriteList.dart';
+import './personality/settingAge.dart';
 import '../screen/emotionReport/reportPage.dart';
 import '../screen/gree/generativeAIprompt.dart';
 
