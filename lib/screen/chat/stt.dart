@@ -92,11 +92,17 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void createKeywordMapping() {
-    List<String> koreanKeywords = ['걷', '춤', '안녕']; // 한글 키워드 목록
+    List<List<String>> koreanKeywordGroups = [
+      ['걷', '걸'],
+      ['댄스', '춤'],
+      ['안녕', '인사'],
+    ];
     List<String> keys = keywordToGifUrl.keys.toList();
 
-    for (int i = 0; i < keys.length; i++) {
-      keywordMapping[koreanKeywords[i]] = keys[i];
+    for (int i = 0; i < koreanKeywordGroups.length; i++) {
+      for (String keyword in koreanKeywordGroups[i]) {
+        keywordMapping[keyword] = keys[i];
+      }
     }
     print("keywordMapping contents: $keywordMapping");
   }
