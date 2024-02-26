@@ -79,6 +79,8 @@ class _ReportPageState extends State<ReportPage> {
         throw Exception('No sentences returned');
       }
 
+      await Future.delayed(Duration(seconds: 3));
+
       var report = await ApiServiceGree.makeEmotionReport(sentences, widget.greeId!);
       if (report == null) {
         throw Exception('Report generation failed');
@@ -270,8 +272,8 @@ class _ReportPageState extends State<ReportPage> {
             Expanded(
               child: Image.network(
                 urls[emotions.keys.elementAt(touchedIndex)] ?? '',
-                width: 70.0,
-                fit: BoxFit.cover,
+                width: 70,
+                fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   // 로드 실패 시 콘솔에 에러 메시지 출력
                   print("Image load failed: $error");
