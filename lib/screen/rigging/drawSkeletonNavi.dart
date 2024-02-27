@@ -46,7 +46,7 @@ Align drawSkeletonNavi(BuildContext context, double imageWidth, double imageHeig
               showLoadingDialog(context); // 로딩 대화 상자 표시
               try {
                 await writeNodesToYaml(skeletonInfo, imageWidth, imageHeight, greeid);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('YAML 파일이 서버에 저장됨')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('친구가 생성되었어요!')));
               } finally {
                 closeLoadingDialog(context);// 로딩 종료
                 pageNavi.changePage('ChatPage',  data: PageData(greeId: greeid));
@@ -105,7 +105,7 @@ void showLoadingDialog(BuildContext context) {
               children: [
                 CircularProgressIndicator(), // 로딩 인디케이터
                 SizedBox(width: 20), // 인디케이터와 텍스트 사이의 간격
-                Text("생성 중입니다...(약 1분20초 소요)"), // 로딩 텍스트
+                Text("생성 중입니다...(약 1분 소요)"), // 로딩 텍스트
               ],
             ),
           ],

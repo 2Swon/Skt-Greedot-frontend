@@ -44,7 +44,7 @@ class _GenerativeAIState extends State<GenerativeAI> {
                 CircularProgressIndicator(), // 로딩 스피너
                 SizedBox(height: 20), // 텍스트와 스피너 사이의 간격
                 Text(
-                  "AI 그림을 생성 중입니다...(약 1분 소요)", // 로딩 메시지
+                  "AI 그림을 생성 중입니다...(약 30초 소요)", // 로딩 메시지
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16.0, // 텍스트 크기 조정

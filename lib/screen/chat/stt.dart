@@ -90,12 +90,19 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
   }
-
+  // ['walk', 'dab', 'hello', 'surprise', 'cry', 'wow', 'dance', 'jump', 'scratch', 'bigwave']
   void createKeywordMapping() {
     List<List<String>> koreanKeywordGroups = [
       ['걷', '걸'],
-      ['댄스', '춤'],
+      ['힙합', '댄스'],
       ['안녕', '인사'],
+      ['깜짝', '놀랐'],
+      ['왜그래', 'ㅠ', '슬퍼'],
+      ['우와', '진짜', '신기'],
+      ['춤', '신나'],
+      ['재밌', '기대'],
+      ['엥', '몰르', '몰라'],
+      ['심심']
     ];
     List<String> keys = keywordToGifUrl.keys.toList();
 

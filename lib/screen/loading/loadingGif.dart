@@ -35,6 +35,13 @@ class _LoadingGifWidgetState extends State<LoadingGifWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(gifPaths[currentIndex]);
+    return Center(
+      child: Image.asset(
+        gifPaths[currentIndex],
+        width: 400, // 이미지의 너비를 설정합니다.
+        height: 400, // 이미지의 높이를 설정합니다.
+        fit: BoxFit.cover, // 이미지가 할당된 공간을 꽉 채우도록 설정합니다.
+      ),
+    );
   }
 }
